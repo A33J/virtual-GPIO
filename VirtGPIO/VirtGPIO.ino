@@ -24,7 +24,7 @@
 #define BAUDRATE 500000
 // Recommended 500000, other options 250000 and 115200.  Compare auto-find settings in virtGPIO.py
 
-#define DEVELOPMENT
+//#define DEVELOPMENT
 // DEVELOPMENT VERSION USES PIN A3 AS OUTPUT FOR Serial0 / COMport0
 
 // Libraries expected in default Arduino IDE installation:
