@@ -766,7 +766,7 @@ def str4FromInt(i):
         i = cInt32(i)
         return chr(i&0xff) + chr((i>>8) & 0xff) + chr((i>>16) & 0xff) + chr((i>>24) & 0xff)
 
-# Flagged for possible change by v1.0:
+# Flagged for possible change by v1.0 [MAYBE!]:
 # 1. Flexible 4 pins for stepper rather than consecutive ?
 # 2. Runtime override of auto serial port name and baudrate ?
 # 3. Free selection of Quad pin for quad encoder (maybe within PORTD ie 2-7) ?
@@ -774,3 +774,26 @@ def str4FromInt(i):
 # 5. SPI devices to get individual control of mode?
 # 6. Compatibility with both python 2.7 and python 3 ?
 # 7. auto detection of serial ports available using serialenum.py (https://github.com/djs/serialenum) ??
+
+"""
+ * Copyright (c) 2014 Brian Lavery <vgpio@blavery.com>   http://virtgpio.blavery.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+"""
