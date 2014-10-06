@@ -19,7 +19,7 @@ This module uses USB serial to power and control the arduino.
 # (sudo) edit /boot/cmdline.txt to remove the two phrases "console=ttyAMA0,115200  kgdboc=ttyAMA0,115200"
 # (sudo) edit /etc/inittab to comment out the line containing "/dev/ttyAMA0" (the last line?)
 # (sudo) edit /boot/config.txt by adding a new line "init_uart_clock=16000000"
-# Reboot the rPi.
+# Reboot the rPi...
 # Now, (1) uart is free and available for virtGPIO (rx -> tx and tx -> rx),
 #      (2) and it can go at baudrate speeds way over the usual 115200,
 # Configured as above, the rPi's own GPIO-uart works quite well with virtGPIO arduino at 500000 baud.
