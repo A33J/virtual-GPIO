@@ -76,7 +76,7 @@ for k in range(len(portlist)):
     except:
         pass
 try:
-    #print "Port %s " % Serial.port
+    print "Port %s " % Serial.port
     pass
 except:
     print "Failed to initialise Serial Port."
