@@ -1,0 +1,9 @@
+This set of files should ALL exist in the folder .../sketchbook/VirtGPIO/
+They are the files that compile to the VirtGPIO sketch for the arduino.
+By having them all in the VirtGPIO project folder, 
+they need no further libraries to be installed in standard place  .../sketchbook/libraries/
+
+Further, these files are all tweaked a bit to work together for the VirtGPIO project.
+
+You may STILL have equivalent libraries installed in your own arduino environment:
+They should not interact with these tweaked versions.
