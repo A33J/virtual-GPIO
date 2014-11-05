@@ -40,15 +40,16 @@ Main files:
 
 Documentation on GPIO calls:  See http://virtgpio.blavery.com
 
-Changes made V0.9 -> v0.9.5  :
-Added serialConfig.py for port settings
-Sonar removed from virtGPIO core, out to simple example script
-SPI devices get individual control of mode
-i2c - option to disable arduino's internal pullups
-SPI.xfer2() out to 80 chars, and added unlimited SPI.writebytes()
-Improved RPI syntax compatibility
-Now Python 2.7 / Python 3.3 compatible
+  - Changes made V0.9 -> v0.9.5  :
+  - Added serialConfig.py for port settings
+  - Sonar removed from virtGPIO core, out to simple example script
+  - SPI devices get individual control of mode
+  - i2c - option to disable arduino's internal pullups
+  - SPI.xfer2() out to 80 chars, and added unlimited SPI.writebytes()
+  - Improved RPI syntax compatibility
+  - Now Python 2.7 / Python 3.3 compatible
 
+DISCLAIMER on the associated libraries (mcp23017, lcd16x2, nokia5110, nrf24, tft144) - these are a work in progress, and recently have been exercised more against virtual-GPIO than Raspberry Pi. There are sure to be various updates/corrections to those. The virtual-GPIO core library itself (v0.9.5) should be fairly intact.  BL 5 Nov 2014.
 
 V0.9.5
 November 2014
