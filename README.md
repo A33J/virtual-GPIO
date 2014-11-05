@@ -40,5 +40,15 @@ Main files:
 
 Documentation on GPIO calls:  See http://virtgpio.blavery.com
 
+Changes made V0.9 -> v0.9.5  :
+Added serialConfig.py for port settings
+Sonar removed from virtGPIO core, out to simple example script
+SPI devices get individual control of mode
+i2c - option to disable arduino's internal pullups
+SPI.xfer2() out to 80 chars, and added unlimited SPI.writebytes()
+Improved RPI syntax compatibility
+Now Python 2.7 / Python 3.3 compatible
+
+
 V0.9.5
 November 2014
