@@ -10,14 +10,14 @@ led = 6   # put a LED on pin 6
 # Note object GPIO.AVR for MCU register access is pre-defined for us in virtGPIO.py
 # and pre-defined register names are in virtGPIO.py
 
-GPIO.setup(led,GPIO.OUTPUT)
+GPIO.setup(led,GPIO.OUT)
 
 c=0
 
 while True:
     c += 1
     GPIO.output(led,c & 1)   # LED blink
-    print "pin 6 input by raw atmega238 access", ((GPIO.AVR.read8(GPIO.AVR.PIND) & 0x40) > 0)
+    print ("pin 6 input by raw atmega238 access %d " % ((GPIO.AVR.read8(GPIO.AVR.PIND) & 0x40) > 0))
     # Guided by 328 MCU manual, we read 8-bit register "PIND" and select bit 6
     # See  <http://www.atmel.com/Images/doc8161.pdf> page 93
     # and <http://arduino.cc/en/Hacking/PinMapping168>

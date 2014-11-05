@@ -13,10 +13,10 @@ c=0  # simple loop counter
 # Next line is the key. If we clear the arduino's reset flag,
 # then we can later test if arduino was (accidentally) reset later on.
 GPIO.clearResetFlag()
-GPIO.setup(led,GPIO.OUTPUT)
-print "If you press Arduino reset, this script will detect that, and take action ..."
+GPIO.setup(led,GPIO.OUT)
+print ("If you press Arduino reset, this script will detect that, and take action ...")
 while True:
-    print "Loop", c
+    print ("Loop %d" % c)
     c = (c+1)
 
     GPIO.output(led,c & 1)   # LED blinking
@@ -24,7 +24,7 @@ while True:
     if not(c%4):    # every 4th loop we test if arduino was reset (& working again, approximately)
         # If YOU had pressed reset. then our python will spot it now
         if (GPIO.resetFlagIsOn()):
-            print "Arduino is reset! This program going down for restart ..."
+            print ("Arduino is reset! This program going down for restart ...")
             GPIO.restart_program()
 
     time.sleep(3)

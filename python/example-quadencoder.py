@@ -20,16 +20,17 @@ import virtGPIO as GPIO
 
 counter2 = GPIO.Intcounter(2, GPIO.Intcounter.QUAD)
 # Quad encoder oper
-GPIO.setup(2,GPIO.OUTPUT)
-GPIO.setup(4,GPIO.OUTPUT)
+GPIO.setup(2,GPIO.OUT)
+GPIO.setup(4,GPIO.OUT)
 
 counter3 = GPIO.Intcounter(3, GPIO.Intcounter.QUAD)
-GPIO.setup(3,GPIO.OUTPUT)
-GPIO.setup(5,GPIO.OUTPUT)
-print
-print "Initial counter readings: ",  counter2.read()
-print "We will now count one UP and one DOWN."
-print "1000 pulses. (Quad encoder counts at both rising and falling edges) ..."
+GPIO.setup(3,GPIO.OUT)
+GPIO.setup(5,GPIO.OUT)
+print()
+print ("Initial counter readings: "),
+print ( counter2.read())
+print ("We will now count one UP and one DOWN.")
+print ("1000 pulses. (Quad encoder counts at both rising and falling edges) ...")
 for k in range(1,2001):
     GPIO.output(4,(k&1))   # quad pin leads on first counter
     GPIO.output(2,(k&1))
@@ -37,8 +38,6 @@ for k in range(1,2001):
     GPIO.output(3,(k&1))   # main pin leads on other
     GPIO.output(5,(k&1))
 
-    GPIO.sync()
-    # a perfect example of correct use of sync(). Don't send faster than serial stream and/or arduino can cope.
-
-print "... Done"
-print "Now read both (16-bit unsigned) counters: ", counter2.read()
+print ("... Done")
+print ("Now read both (16-bit unsigned) counters: "),
+print (counter2.read())

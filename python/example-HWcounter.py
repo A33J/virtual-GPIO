@@ -11,7 +11,7 @@ import time
 import virtGPIO as GPIO
 
 led = 5
-GPIO.setup(led,GPIO.OUTPUT)
+GPIO.setup(led,GPIO.OUT)
 
 counter5 = GPIO.HWcounter()
 # set up pin 5 as a hardware counter (rising edge). It can STILL do any other GPIO job!
@@ -19,14 +19,14 @@ counter5 = GPIO.HWcounter()
 c=0
 
 while True:
-    print c
+    print (c)
 
     c = (c+1)
     GPIO.output(led,c & 1)   # LED blink on pin 5
-    print "Dig read 5 = %d" % GPIO.digitalRead(led)   # read pin 5 straight back to confirm
+    print ("Dig read 5 = %d" % GPIO.input(led))   # read pin 5 straight back to confirm
 
     # But pin 5 is ALSO doing a counter job. Read the current count
-    print "HW ctr: %x" % counter5.read() #
+    print ("HW ctr: %x" % counter5.read()) #
 
     if not (c%100):  # every 100 passes
         counter5.zero()

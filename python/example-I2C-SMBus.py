@@ -45,16 +45,16 @@ print("Read the A/D")
 print("Ctrl C to stop")
 sleep(1)
 
-print "\033[2J"
+print ("\033[2J")
 # "Ansi Sequence" to clear screen. Look it up on Wikipedia,
 #     or http://www.isthe.com/chongo/tech/comp/ansi_escapes.html
-print "\033[2;0HThis script makes Aout track the POTENTIOMETER (knob) reading."
-print " You could (very carefully) read the Aout pin with a voltmeter."
-print " A non-metallic screwdriver is best for the POT: it can get shorted!"
-print "If you connect Aout back into (spare) Ain2 by wire,\n then Ain2 will also track the KNOB."
+print ("\033[2;0HThis script makes Aout track the POTENTIOMETER (knob) reading.")
+print (" You could (very carefully) read the Aout pin with a voltmeter.")
+print (" A non-metallic screwdriver is best for the POT: it can get shorted!")
+print ("If you connect Aout back into (spare) Ain2 by wire,\n then Ain2 will also track the KNOB.")
 
 while(True): # do forever
-    print "\033[7;0H\033[32m"    # Re-position cursor to known spot on screen (Line7, Col0). (& colour the font)
+    print ("\033[7;0H\033[32m")    # Re-position cursor to known spot on screen (Line7, Col0). (& colour the font)
     # The reading sequence takes some getting head around!  We need to TRIGGER A CAPTURE on the chip.
     # The READ command does that triggering. The capture process take a (small) time to process, and we don't wait around for it to finish.
     # But that read call actually returns the PREVIOUSLY requested capture, now waiting to be collected.
@@ -65,24 +65,24 @@ while(True): # do forever
     # Meantime, capturing on Ain0 is done very quickly ...
     reading0 = 255 - bus.read_byte(ADDR_8591)    # Read (now ready) Ain0 capture, start new capture (on Ain1), and incr channel# to Ain2
     # read value is 0 - 255. Actually 255 = dark, and 0 = very bright. Non-intuitive to humans - turn this upside down so 0 means dark.
-    print "Ain0:  Light:   " + str(reading0) + "  (0-255. How could we 'calibrate' that?)    "
+    print ("Ain0:  Light:   " + str(reading0) + "  (0-255. How could we 'calibrate' that?)    ")
 
     reading1 = 255 - bus.read_byte(ADDR_8591)    # Read the Ain1 capture, start new capture (on Ain2), and incr channel# counter to Ain3
-    print "Ain1:  Temp:    " + str(reading1) + "  (0-255. But what degrees does that mean??)   "
+    print ("Ain1:  Temp:    " + str(reading1) + "  (0-255. But what degrees does that mean??)   ")
 
     reading2 = bus.read_byte(ADDR_8591)          # ... etc
-    print "Ain2:           " + str(reading2)  + "  (i.e., Volts=" + str(round(reading2 * 5.0 / 255, 2))  + ")    "
+    print ("Ain2:           " + str(reading2)  + "  (i.e., Volts=" + str(round(reading2 * 5.0 // 255, 2))  + ")    ")
     # readings 0 to 255 scale to the voltage range 0v to 5.0v (or whatever voltage the module is running at)
 
     knobReading = 255 - bus.read_byte(ADDR_8591)
-    print "Ain3:  Knob:    " + str(knobReading) + "  (hex: %X  bin: " % knobReading + bin(knobReading) + ")  "
+    print ("Ain3:  Knob:    " + str(knobReading) + "  (hex: %X  bin: " % knobReading + bin(knobReading) + ")  ")
 
 
     # Simply push the POTENTIOMETER KNOB reading (0-255) back out the Analog Output pin (0-255)
     Aout = knobReading
     bus.write_byte_data(ADDR_8591, OUT_ENABLED, Aout);
-    print "\n\033[33mAout:  Output:  " + str(Aout) + "  (0-255 means 0.0V to 5.0V)"
-    print "\n\033[34mCTRL-C to exit ..."
+    print ("\n\033[33mAout:  Output:  " + str(Aout) + "  (0-255 means 0.0V to 5.0V)")
+    print ("\n\033[34mCTRL-C to exit ...")
 
     sleep(0.5)
 

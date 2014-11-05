@@ -1,4 +1,6 @@
-// VirtGPIO.ino
+// VirtGPIO.ino   V0.9.5
+
+#define _Version 95
 
 // This is the arduino end of virtual-gpio, using arduino as a GPIO device on PC or Raspberry Pi
 // This sketch is designed to support specifically the atmega328 (eg Nano or Uno)
@@ -12,25 +14,28 @@
 // (Perhaps you use Pro-Mini arduino with no USB function?)
 // Install "arduino" software on rPi using apt-get or synaptic.
 // At rPi terminal enter:     ~$    "sudo ln /dev/ttyAMA0 /dev/ttyS1"
-// Then Arduino IDE will recognise the UART serial port under alias of "/dev/ttyS1"
+// Then Arduino IDE will recognise the UART serial port under alias of "/dev/ttyS1" (It can't handle AMA0)
 // That is good for current session. To make the alias permanent, look here:
 // <http://www.linuxcircle.com/2013/04/23/install-and-test-arduino-ide-with-raspberry-pi-and-gertboard/>
-// You'll need to learn (a) to be patient while recompiling - it's slow
-//                      (b) to become expert in releasing the reset button EXACTLY at upload start time
+// You'll need to learn (a) to be patient while recompiling on RPi - it's slow
+//                      (b) to become expert in releasing the arduino reset button EXACTLY at upload start time
 
+
+#ifndef __AVR_ATmega328P__
+#error This sketch expects an atmega 328 (Uno, Nano, Pro mini 328)
+#endif
 
 
 #define NUM_TXCOMPORTS 5
 #define BAUDRATE 500000
-// Recommended 500000, other options 250000 and 115200.  Compare auto-find settings in virtGPIO.py
+// Recommended 500000, other suitable options 250000 and 115200.
 
-//#define DEVELOPMENT
+//// #define DEVELOPMENT
 // DEVELOPMENT VERSION USES PIN A3 AS OUTPUT FOR Serial0 / COMport0
 
 // Libraries expected in default Arduino IDE installation:
 #include <SPI.h>
 #include <Servo.h>
-#include <Wire.h>
 #include "Arduino.h"
 
 // OPTIONAL library - this one should be installed conventionally in .../sketchbook/libraries/
@@ -40,6 +45,7 @@
 // Custom and 3rd-party libraries. Note ALL the following are NOT in "...sketchbook/libraries/",
 // rather they are in virtGPIO project space. That way, you don't need to install them in libraries folder,
 // and in any case nearly all of them are specially tweaked for virtGPIO.
+#include "Wire_vg.h"
 #include "IRremote_vg.h"
 #include "TimerOne_vg.h"
 #include "Stepper_vg.h"
@@ -58,7 +64,7 @@ int activityLED = 13;
 
 volatile unsigned int d2_pulses=0, d3_pulses=0; // counters for INTcounter on 2 or 3
 int quadpin[2];   // the pin #s (if existing) for quad pins of QuadEncoder (ie INTcounter)
-unsigned char buf[40];  // for SPI
+unsigned char buf[130];  // for SPI
 bool SPI_on = false;
 bool IR_on = false;
 bool I2C_on = false;
@@ -72,6 +78,13 @@ enum {
 #define SERIALWRITE2(v)        {Serial.write(v & 0xff);Serial.write((v >> 8)&0xff);}
 #define SERIALWRITE3(v)        {Serial.write(v & 0xff);Serial.write((v >> 8)&0xff);Serial.write((v>>16)&0xff);}
 #define LOGFAIL(x)             bitSet(flags, x)
+
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
 
 
 //------------------------------------------------------------------------------------
@@ -186,7 +199,7 @@ void setup(void)
 #ifdef MEMORY_FREE_H
   printf("Free mem %d\n", freeMemory());
 #endif
-  printf("Serial %ld baud\nV0.9 Compiled %s\nReady ...", BAUDRATE, __DATE__);
+  printf("Serial %ld baud\nV0.9.5 Compiled %s\nReady ...", BAUDRATE, __DATE__);
 #endif
 
 
@@ -198,11 +211,11 @@ void loop ()
 {
   static int SPI_modes[4] = {
     SPI_MODE0, SPI_MODE1, SPI_MODE2, SPI_MODE3    };
-  unsigned int pin, pin2, mode , bufIndex, SPR;
+  unsigned int pin, pin2, mode , bufIndex, SPR, spi, p[7];
   unsigned int speed, aVal, dVal, ln, icount, k, registAddr, quad, id, port;
   long int usec;
   int  steps;
-  unsigned char cmd, c;
+  unsigned char cmd, c, d1, d2;
   unsigned long timeo1, timeo2;
   static unsigned long tim;
   static unsigned int idleCounter = 0;
@@ -224,7 +237,7 @@ void loop ()
     case 'S':
       // SPI open/init
       pin = serGetchar() & 0x1f;    //    CE pin
-      mode = SPI_modes[serGetchar() & 3];
+      //mode = SPI_modes[serGetchar() & 3];
       if (!pinGood(pin))
       {
         LOGFAIL(F_spi);
@@ -270,19 +283,74 @@ void loop ()
       //  timings: 100 uSec @ 1 char,   1700 uSec @ 32 char
       pin = serGetchar() & 0x1f;
       //  actual pin# for CE arrives here  (= 10-7)
-      ln = serGetchar() & 0x1f;
+      mode = SPI_modes[serGetchar() & 3];
+      ln = serGetchar() & 0x7f;
       for (k=0; k<ln; k++)
         buf[k] = serGetchar();
       if (!SPI_on)
       {
         LOGFAIL(F_nospi);
-        break;    // yeah! the caller is going to timeout waiting!!
+        break;    // yeah! the caller is going to timeout waiting!! Someone will tweak!
       }
+      // This function buffers all the incoming Serial chars, then does exchange with SPI
+      SPI.setDataMode(mode);
       digitalWrite(pin, LOW);
       for (bufIndex=0; bufIndex<ln; bufIndex++)
         Serial.write(SPI.transfer(buf[bufIndex]));
       // exact reply from SPI - send it straight out
       digitalWrite(pin, HIGH);
+      break;
+
+
+    case 'x':
+      // SPI transfer block OUT ONLY. CSN/CEx asserted down around the block of transfers
+      // Further, the block can be marked "multi" and then CE remains asserted waiting for next portion.
+      pin = serGetchar() & 0x1f;
+      //  actual pin# for CE arrives here  (= 10-7)
+      mode = serGetchar();
+      c = mode >> 4;   // "multi: to be continued later" flag
+      ln = serGetchar() & 0x3f;  // 63 max
+      if (!SPI_on)
+      {
+        LOGFAIL(F_nospi);
+        Serial.write(0);
+        break;
+      }
+      mode = SPI_modes[mode & 3];
+      SPI.setDataMode(mode);
+      digitalWrite(pin, LOW);
+      // This function does not buffer incoming. Sent to SPI as fast as received from Serial
+      for (k=0; k<ln; k++)
+        SPI.transfer(serGetchar());
+      if (!c)   // Multi?  are we going to get more for this transmission?
+        digitalWrite(pin, HIGH);  // not continuing. de-assert CE
+      Serial.write(1);
+      break;
+
+    case 'g':
+      // SPI FILL write. Repetitive send of one or 2 bytes to SPI
+      pin = serGetchar() & 0x1f;
+      mode = serGetchar();
+      icount = serGetchar();
+      icount += 256*serGetchar();
+      d1 = serGetchar();
+      d2 = serGetchar();
+      if (!SPI_on)
+      {
+        LOGFAIL(F_nospi);
+        Serial.write(0);
+        break;
+      }
+      mode = SPI_modes[mode & 3];
+      SPI.setDataMode(mode);
+      digitalWrite(pin, LOW);
+      for (k=0; k<icount; k++)
+      {
+        SPI.transfer(d2);
+        SPI.transfer(d1);
+      }
+      digitalWrite(pin, HIGH);
+      Serial.write(1);
       break;
 
 
@@ -300,6 +368,7 @@ void loop ()
       mode = serGetchar() & 0x0003;
       if (pinGood(pin))
         digitalWrite (pin, mode) ;
+      Serial.write(0);  // just for sync
       break ;
 
     case 'U':
@@ -461,9 +530,16 @@ void loop ()
 
     case 't':
       // compilation date
-      Serial.print(__DATE__);
-      Serial.print("  VirtGPIO V0.9");
+      Serial.print(((float)_Version)/100.0);
+      Serial.print(" VirtGPIO ");
+      Serial.print( __DATE__);
       break;
+
+    case 'T':
+        // version #
+        Serial.write (_Version);
+        break;
+
 
     case '+':
       // Read Arduino Supply volts VCC
@@ -478,6 +554,10 @@ void loop ()
 
     case '!':
       // i2c begin()
+      mode = serGetchar() & 1;  // = enable pullups?
+      if (I2C_on)
+          break;  // Not illegal to make a duplicate start to I2C system.
+
       if (I2C_on || !pinGood(18) || !pinGood(19))
       // A4 & A5 are i2c pins
       {
@@ -485,7 +565,17 @@ void loop ()
         break;
       }
       Wire.begin();
+      if (mode)
+      {
+        // modified TWI library code no longer enables pullups by default (special mod for virtual GPIO)
+        // here is where we now get the option, pullups or not.
+        // this new option is for 3.3V i2c devices on 5V arduino i2c pins, where 3.3v device has own pullups
+        // we are now hoping that the 3.3v logic can operate 5v arduino i2c input - slightly out of spec!
+        sbi(PORTC, 4);   // enable internal pullups
+        sbi(PORTC, 5);
+      }
       I2C_on = true;
+
       reservePin(18);
       reservePin(19);
       break;
@@ -498,6 +588,7 @@ void loop ()
       for (k=0; k<icount; k++)
         Wire.write(serGetchar());
       Wire.endTransmission();
+      Serial.write(0); // dummy for syncing only
       break;
 
     case 'c':
@@ -779,7 +870,6 @@ void loop ()
     case 0xd1:
       // RxSerial   chrs available?
       Serial.write( Serial2.available());
-
       break;
 
     case 0xd2:
@@ -788,7 +878,6 @@ void loop ()
       for (k=0; k<= icount; k++)
         Serial.write(Serial2.read() & 0xff);
         // NOTE: requesting more than in buffer will result in FF characters to fill the quota!
-
       break;
 
     case '^':
@@ -796,6 +885,7 @@ void loop ()
       tracing = 1;
       //traceCtr = 0;
       break;
+
     case '<':
       // trace off
       tracing = 0;

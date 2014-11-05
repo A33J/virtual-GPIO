@@ -11,27 +11,26 @@ led = 9
 # Setup: a LED on pin 9,
 #        plus a jumper from pin 9 to pin A2
 
-GPIO.setup(led,GPIO.OUTPUT)
+GPIO.setup(led,GPIO.OUT)
 c = 0
 
 while True:
 
     c = (c+21)
     GPIO.output(led,c & 1)   # LED blink
-    print "Written LED as %d" % (c&1)
-    ## GPIO.digitalWrite(led, c&1)   would work also
+    print ("Written LED as %d" % (c&1))
 
-    # read it back - rPi style & arduino style
-    print "pin%d=%x" % (led, GPIO.digitalRead(led))
-    print "pin%d=%x" % (led, GPIO.input(led))
+    # read it back
+    print ("pin%d=%x" % (led, GPIO.input(led)))
+
 
     # Analog 2 is tied to LED, so should go from 0000 to 03FF  (0 to 1023)
-    print "anl2 = %04x" % GPIO.analogRead(GPIO.A2)
+    print ("anl2 = %04x" % GPIO.analogRead(GPIO.A2))
 
-    time.sleep(1)
+    time.sleep(5)
 
     # pin 9 is also a native PWM pin on arduino:
-    print "Changing pwm brightness to %d" % (c%255)
+    print ("Changing pwm brightness to %d" % (c%255))
     GPIO.pwmWrite(led, c % 256)
 
-    time.sleep(1)
+    time.sleep(6)

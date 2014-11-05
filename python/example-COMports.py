@@ -28,5 +28,5 @@ COM2.Print("\nCOM2 (port3 pin6): ")
 time.sleep(0.01)
 COM2.Print("Don't believe the other guy.")
 
-print "Done. We sent 2400 baud text to buffered COM port 0 on pin A3, and direct COM port 3 on pin 6."
-print "Study the python code."
+print ("Done. We sent 2400 baud text to buffered COM port 0 on pin A3, and 2400 direct COM port 3 on pin 6.")
+print ("Study the python code.")

@@ -10,6 +10,6 @@ while True:
 
     irchr = IR.read()
     if irchr:
-        print "IR Remote: %x %d" % (IR.device(), irchr)
+        print ("IR Remote: %x %d" % (IR.device(), irchr))
 
     time.sleep(1)

@@ -1,7 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-# setup:  sr04 4-pin ultrasonic device, trigger pin4, echo pin6, supply = 5V
-# (3.3V not adequate for SR04)
 
 import time
 import virtGPIO as GPIO
@@ -30,9 +29,20 @@ class Sonar:
       # However, my empirical calibration gives formula a/70.   YMMV - correct the scaling for yourself!
 
 
+sonar1 = Sonar(4,6)   # trig echo
 
-sonar1 = Sonar(4,6)   # trigger    echo
-
+lastDist = 0
 while True:
-    print ("sonar: %d" % sonar1.ping())
+
+    dist = sonar1.ping()
+    ratio = 1.0 # default for div by zero case
+    if dist > 0:
+      ratio = 1.0 * lastDist // dist
+    lastDist = dist
+    # lets filter out wildly fluctuating values, also anything over 2 metres
+    # also, dist<0, the ERROR return, should be discarded
+    if ratio>1.15 or ratio < 0.88 or dist > 200 or dist<0:
+      time.sleep(0.1)
+      continue
+    print (dist)
     time.sleep(1)

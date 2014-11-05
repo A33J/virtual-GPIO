@@ -16,10 +16,10 @@ import virtGPIO as GPIO
 
 led = 9
 
-GPIO.setup(led,GPIO.OUTPUT)
+GPIO.setup(led,GPIO.OUT)
 c=0
 
-print "Activity LED = 13"
+print ("Activity LED = 13")
 
 while True:
     c+=1
@@ -27,20 +27,20 @@ while True:
 
 
     if (c==100):   # after 10 secs
-        print "Activity Led changed to 0 (=off)"
+        print ("Activity Led changed to 0 (=off)")
         GPIO.setActivityLed(0)
 
     if (c==200):    # after 20 secs
-        print "Activity Led changed to %d" % led
-        print "Note blink function has been killed, now just activity indicator."
+        print ("Activity Led changed to %d" % led)
+        print ("Note blink function has been killed, now just activity indicator.")
         GPIO.setActivityLed(led)
 
     if (c==300):   # after 30 secs
         time.sleep(1)
-        print "Observe (on LED) slightly longer blocking function (= fail to start pulse?)"
-        print "pulseIn returns (error?) code", hex(GPIO.pulseIn(4, GPIO.HIGH, 200, 10000))
+        print ("Observe (on LED) slightly longer blocking function (= fail to start pulse?)")
+        print ("pulseIn returns (error?) code %x" % GPIO.pulseIn(4, GPIO.HIGH, 200, 10000))
         # it aint gonna happen: that pin is doing nothing.
-        print "Fin"
+        print ("Fin")
         break;
 
     time.sleep(0.1)

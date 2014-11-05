@@ -36,9 +36,9 @@ Atmega328 is assumed.
 Main files:
   - VirtGPIO.ino (and its acompanying library files) essential - sketch for Arduino end.
   - virtGPIO.py essential library at Raspberry Pi or PC.
-  - collection of over 20 example python files demonstrating use of virtual GPIO.
+  - collection of example python files demonstrating use of virtual GPIO.
 
 Documentation on GPIO calls:  See http://virtgpio.blavery.com
 
-V0.9
-October 2014
+V0.9.5
+November 2014
