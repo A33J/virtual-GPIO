@@ -1,6 +1,6 @@
-// VirtGPIO.ino   V0.9.5
+// VirtGPIO.ino   V0.9.6
 
-#define _Version 95
+#define _Version 96
 
 // This is the arduino end of virtual-gpio, using arduino as a GPIO device on PC or Raspberry Pi
 // This sketch is designed to support specifically the atmega328 (eg Nano or Uno)
@@ -313,7 +313,7 @@ void loop ()
       if (!SPI_on)
       {
         LOGFAIL(F_nospi);
-        Serial.write(0);
+        Serial.write(1);
         break;
       }
       mode = SPI_modes[mode & 3];
@@ -338,7 +338,7 @@ void loop ()
       if (!SPI_on)
       {
         LOGFAIL(F_nospi);
-        Serial.write(0);
+        Serial.write(1);
         break;
       }
       mode = SPI_modes[mode & 3];
@@ -368,7 +368,7 @@ void loop ()
       mode = serGetchar() & 0x0003;
       if (pinGood(pin))
         digitalWrite (pin, mode) ;
-      Serial.write(0);  // just for sync
+      Serial.write(1);  // just for sync
       break ;
 
     case 'U':
@@ -584,11 +584,11 @@ void loop ()
       // Write byte(s) to i2c
       // simply not going to work if i2c failed to start
       icount = serGetchar();
-      Wire.beginTransmission(serGetchar());
+      Wire.beginTransmission(serGetchar());  // port address
       for (k=0; k<icount; k++)
         Wire.write(serGetchar());
+      Serial.write(1); // dummy for syncing only
       Wire.endTransmission();
-      Serial.write(0); // dummy for syncing only
       break;
 
     case 'c':

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# virtGPIO.py   V0.9.5
+# virtGPIO.py   V0.9.6
 
 """
 "Virtual GPIO" uses an arduino as a GPIO device to a Raspberry Pi or PC.
@@ -261,7 +261,7 @@ PUD_DOWN = 21
 PUD_OFF = 20
 BCM = 11
 BOARD = 10
-VERSION = "0.9.5"
+VERSION = "0.9.6"
 RPI_REVISION = 0
 
 def setmode(mode):
@@ -648,6 +648,8 @@ class I2C:
 
     def write(self, port, txbuf):
         # txbuf = list of integers
+        if len(txbuf) > 32:
+            print ("I2C limit at arduino is 32 chars !!")
         L = len(txbuf)
         _SerialWrite("W" + chr(L) + chr(port))
         _SerialWrite(txbuf);
@@ -703,6 +705,12 @@ class I2C:
 
     def write_word_data(self, addr, cmd, data):
         pass  # nyi
+
+    def write_block_data(self, addr, cmd, data):
+        pass   # nyi
+
+    def write_i2c_block_data(self, addr, cmd, data):   # March 2015
+        self.write( addr, [cmd]+data)
 
 
 
